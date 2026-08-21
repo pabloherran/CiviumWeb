@@ -29,3 +29,22 @@ export interface CreateInvitationRequest {
   /** Obligatorio solo para SUPER_ADMIN. */
   municipalityId?: string
 }
+
+/** Respuesta de DELETE /admin/users/{id}. */
+export interface DeleteUserResponse {
+  deleted: boolean
+  municipalityId?: string | null
+  /**
+   * Admins que quedan en el municipio tras el borrado. Solo viene informado
+   * cuando el usuario borrado era MUNICIPAL_ADMIN. Si llega a 0 y quedan
+   * `orphanOperators`, conviene ofrecer dar de baja el municipio completo.
+   */
+  remainingAdmins?: number | null
+  orphanOperators?: number | null
+}
+
+/** Respuesta de DELETE /admin/municipalities/{ine}/users. */
+export interface MunicipalityDeletionResponse {
+  deletedUsers?: string | null
+  municipalityId?: string | null
+}

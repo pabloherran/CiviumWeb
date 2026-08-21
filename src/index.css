@@ -221,6 +221,25 @@ code {
   color: var(--color-primary);
 }
 
+.btn-danger {
+  background: var(--color-danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background: #8c1414;
+}
+
+.btn-link-danger {
+  background: none;
+  border: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+
 .btn-ghost {
   background: transparent;
   color: var(--color-text-muted);
@@ -424,6 +443,20 @@ code {
   color: var(--color-resolved);
 }
 
+/* Estado de un usuario (activo/inactivo) — mismos tonos que arriba pero con
+   su propio nombre de clase para no mezclar semántica con el estado de una
+   incidencia: activo = verde, inactivo = ámbar. */
+
+.badge-active {
+  background: var(--color-resolved-bg);
+  color: var(--color-resolved);
+}
+
+.badge-inactive {
+  background: var(--color-open-bg);
+  color: var(--color-open);
+}
+
 /* Tabs */
 
 .tabs {
@@ -478,4 +511,71 @@ code {
   flex-direction: column;
   gap: 4px;
   font-size: 0.85rem;
+}
+
+/* Modal */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 26, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.modal-card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.modal-body p {
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.danger-zone {
+  border: 1px dashed var(--color-danger);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.danger-zone h2 {
+  color: var(--color-danger);
+}
+
+.row-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.suggestion-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
