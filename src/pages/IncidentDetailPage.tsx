@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getIncidentById, setIncidentResolved } from '../api/incidents'
+import { getIncidentById } from '../api/incidents'
 import { AuthenticatedImage } from '../components/AuthenticatedImage'
 import { StatusBadge } from '../components/StatusBadge'
 import type { Incident } from '../types/incident'
 import { CATEGORY_LABELS, formatDate } from '../utils/labels'
 
+/**
+ * Detalle de incidencia: SOLO lectura para MUNICIPAL_ADMIN/SUPER_ADMIN, los
+ * únicos roles que acceden al portal. No se ofrece resolver/reabrir/borrar
+ * incidencias aquí: esos roles son gestores, no operarios sobre el terreno
+ * (esa acción sigue existiendo en la app Android para OPERATOR). Lo único
+ * que tendrán, cuando se implemente, es asignar la incidencia a un operario.
+ */
 export function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [incident, setIncident] = useState<Incident | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [resolutionNote, setResolutionNote] = useState('')
-  const [saving, setSaving] = useState(false)
 
   const load = useCallback(() => {
     if (!id) return
@@ -28,38 +33,6 @@ export function IncidentDetailPage() {
   useEffect(() => {
     load()
   }, [load])
-
-  async function handleResolve() {
-    if (!id) return
-    if (resolutionNote.trim().length < 10) {
-      setError('La nota de resolución debe tener al menos 10 caracteres.')
-      return
-    }
-    setSaving(true)
-    setError(null)
-    try {
-      const updated = await setIncidentResolved(id, { resolved: true, resolutionNote })
-      setIncident(updated)
-    } catch {
-      setError('No se ha podido marcar la incidencia como resuelta.')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleReopen() {
-    if (!id) return
-    setSaving(true)
-    setError(null)
-    try {
-      const updated = await setIncidentResolved(id, { resolved: false })
-      setIncident(updated)
-    } catch {
-      setError('No se ha podido reabrir la incidencia.')
-    } finally {
-      setSaving(false)
-    }
-  }
 
   if (loading) return <p className="hint">Cargando incidencia…</p>
   if (error && !incident) return <div className="form-error">{error}</div>
@@ -140,30 +113,6 @@ export function IncidentDetailPage() {
             planificada para una fase posterior — requiere añadir un campo de asignación en el
             backend y soporte en la app móvil, que todavía no existen.
           </p>
-        </section>
-
-        <section className="card">
-          <h2>Gestión de estado</h2>
-          {error && <div className="form-error">{error}</div>}
-          {incident.status === 'OPEN' ? (
-            <div className="resolve-form">
-              <label className="field">
-                <span>Nota de resolución (obligatoria, mín. 10 caracteres)</span>
-                <textarea
-                  value={resolutionNote}
-                  onChange={(e) => setResolutionNote(e.target.value)}
-                  rows={4}
-                />
-              </label>
-              <button className="btn btn-primary" onClick={handleResolve} disabled={saving}>
-                {saving ? 'Guardando…' : 'Marcar como resuelta'}
-              </button>
-            </div>
-          ) : (
-            <button className="btn btn-secondary" onClick={handleReopen} disabled={saving}>
-              {saving ? 'Guardando…' : 'Reabrir incidencia'}
-            </button>
-          )}
         </section>
       </div>
     </div>
