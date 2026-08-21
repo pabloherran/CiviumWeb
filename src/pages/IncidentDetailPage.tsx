@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getIncidentById, setIncidentResolved } from '../api/incidents'
+import { AuthenticatedImage } from '../components/AuthenticatedImage'
 import { StatusBadge } from '../components/StatusBadge'
 import type { Incident } from '../types/incident'
 import { CATEGORY_LABELS, formatDate } from '../utils/labels'
@@ -112,14 +113,18 @@ export function IncidentDetailPage() {
         {incident.reportPhotoUrl && (
           <section className="card">
             <h2>Foto del reporte</h2>
-            <img className="detail-photo" src={incident.reportPhotoUrl} alt="Foto del reporte" />
+            <AuthenticatedImage
+              className="detail-photo"
+              src={incident.reportPhotoUrl}
+              alt="Foto del reporte"
+            />
           </section>
         )}
 
         {incident.resolutionPhotoUrl && (
           <section className="card">
             <h2>Foto de resolución</h2>
-            <img
+            <AuthenticatedImage
               className="detail-photo"
               src={incident.resolutionPhotoUrl}
               alt="Foto de resolución"
