@@ -1,0 +1,42 @@
+# Despliegue a Firebase Hosting — plataforma definitiva recomendada para
+# cuando el portal pase a producción (ver README, sección "Despliegue").
+#
+# Desactivado por defecto (solo se lanza a mano) hasta que:
+#   1. Exista el proyecto/sitio de Firebase Hosting (firebase init hosting).
+#   2. Se haya creado el secret FIREBASE_SERVICE_ACCOUNT en este repo
+#      (Settings → Secrets and variables → Actions) con las credenciales
+#      de una cuenta de servicio con permiso "Firebase Hosting Admin".
+#   3. Se hayan creado los secrets VITE_API_BASE_URL y
+#      VITE_GOOGLE_MAPS_API_KEY (Vite los necesita en build time).
+#
+# Una vez configurado, cambia el trigger de "workflow_dispatch" a
+# "push: branches: [main]" para que despliegue automáticamente en cada
+# cambio a main.
+name: Deploy a Firebase Hosting
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: SUSTITUYE_POR_TU_PROJECT_ID_DE_FIREBASE
