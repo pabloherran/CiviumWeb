@@ -78,10 +78,9 @@ code {
   padding: 0 8px 20px;
 }
 
-.sidebar-brand-logo {
-  width: 22px;
-  height: auto;
-  flex-shrink: 0;
+.sidebar-brand-wordmark {
+  height: 26px;
+  width: auto;
 }
 
 .sidebar-nav {
@@ -162,21 +161,15 @@ code {
   gap: 16px;
 }
 
-.login-logo {
-  width: 56px;
+.login-wordmark {
+  width: 240px;
   height: auto;
-  color: var(--color-primary);
-}
-
-.login-title {
-  margin: 0;
-  font-size: 1.75rem;
-  color: var(--color-primary);
-  letter-spacing: 0.04em;
+  align-self: center;
+  margin-bottom: 8px;
 }
 
 .login-subtitle {
-  margin: -12px 0 0;
+  margin: 0;
   color: var(--color-text-muted);
 }
 

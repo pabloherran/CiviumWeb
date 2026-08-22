@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { CiviumLogo } from '../components/CiviumLogo'
+import civiumWordmark from '../assets/civium-wordmark.png'
 
 export function LoginPage() {
   const { user, login } = useAuth()
@@ -38,8 +38,7 @@ export function LoginPage() {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={handleSubmit}>
-        <CiviumLogo className="login-logo" />
-        <h1 className="login-title">CIVIUM</h1>
+        <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
         <p className="login-subtitle">Portal de gestión municipal</p>
 
         <label className="field">
