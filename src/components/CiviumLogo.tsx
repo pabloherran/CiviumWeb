@@ -1,0 +1,24 @@
+type CiviumLogoProps = {
+  className?: string
+}
+
+/**
+ * Marca de CIVIUM — mismo trazado que el icono de la app Android y el logo
+ * del splash screen (`ic_civium_splash_logo_azul.xml`). El color se hereda
+ * de `color` vía `currentColor`, así que el tamaño y el color se controlan
+ * desde CSS con `className`.
+ */
+export function CiviumLogo({ className }: CiviumLogoProps) {
+  return (
+    <svg viewBox="0 0 320.62 323.97" className={className} role="img" aria-label="CIVIUM">
+      <path
+        d="M255.56,261.14l-95.68,-55.24 -43.6,-25.18c-6.17,-3.56 -9.98,-10.15 -9.98,-17.28V12.96c0,-9.96 -10.78,-16.18 -19.41,-11.2L16.32,42.5C6.22,48.33 0,59.1 0,70.77v147.06c0,11.59 6.14,22.31 16.14,28.17l79.08,46.32 48.61,27.44c9.96,5.62 22.13,5.62 32.09,0l48.6,-27.44 30.96,-17.49c5.31,-3 5.35,-10.64 0.06,-13.69Z"
+        fill="currentColor"
+      />
+      <path
+        d="M304.3,81.75l-71.44,-41.25c-8.63,-4.98 -19.41,1.24 -19.41,11.2v111.74c0,7.13 -3.8,13.72 -9.98,17.28l-18.77,10.84c-3.13,1.8 -3.13,6.32 0,8.12l96.89,55.94c2.42,1.39 5.39,1.41 7.82,0.04l14.62,-8.26c10.25,-5.79 16.59,-16.65 16.59,-28.42v-108.97c0,-11.66 -6.22,-22.44 -16.32,-28.27Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}

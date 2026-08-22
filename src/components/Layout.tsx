@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { ROLE_LABELS } from '../utils/labels'
+import { CiviumLogo } from './CiviumLogo'
 
 const navItems = [
   { to: '/incidencias', label: 'Incidencias' },
@@ -14,7 +15,10 @@ export function Layout() {
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="sidebar-brand">CIVIUM</div>
+        <div className="sidebar-brand">
+          <CiviumLogo className="sidebar-brand-logo" />
+          <span>CIVIUM</span>
+        </div>
         <nav className="sidebar-nav">
           {navItems.map((item) => (
             <NavLink

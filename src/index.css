@@ -68,11 +68,20 @@ code {
 }
 
 .sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: 0.04em;
   color: var(--color-primary);
   padding: 0 8px 20px;
+}
+
+.sidebar-brand-logo {
+  width: 22px;
+  height: auto;
+  flex-shrink: 0;
 }
 
 .sidebar-nav {
@@ -143,6 +152,12 @@ code {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.login-logo {
+  width: 56px;
+  height: auto;
+  color: var(--color-primary);
 }
 
 .login-title {
