@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext'
 
 const STATUS_OPTIONS: Array<{ value: IncidentStatus | 'ALL'; label: string }> = [
   { value: 'OPEN', label: 'Abiertas' },
+  { value: 'IN_PROGRESS', label: 'En resolución' },
   { value: 'RESOLVED', label: 'Resueltas' },
   { value: 'ALL', label: 'Todas' },
 ]
@@ -110,6 +111,7 @@ export function IncidentsListPage() {
               <th>Título</th>
               <th>Categoría</th>
               <th>Estado</th>
+              <th>Asignada a</th>
               <th>Municipio</th>
               <th>Creada</th>
             </tr>
@@ -126,13 +128,14 @@ export function IncidentsListPage() {
                 <td>
                   <StatusBadge status={inc.status} />
                 </td>
+                <td>{inc.assignedToName ?? '—'}</td>
                 <td>{inc.municipalityId ?? '—'}</td>
                 <td>{formatDate(inc.createdAt)}</td>
               </tr>
             ))}
             {visibleItems.length === 0 && (
               <tr>
-                <td colSpan={5} className="table-empty">
+                <td colSpan={6} className="table-empty">
                   No hay incidencias que coincidan con los filtros.
                 </td>
               </tr>

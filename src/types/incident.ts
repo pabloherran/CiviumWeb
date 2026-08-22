@@ -1,4 +1,4 @@
-export type IncidentStatus = 'OPEN' | 'RESOLVED'
+export type IncidentStatus = 'OPEN' | 'IN_PROGRESS' | 'RESOLVED'
 
 export type IncidentCategory =
   | 'SIDEWALKS'
@@ -18,11 +18,6 @@ export type IncidentCategory =
 /**
  * Incidencia tal y como la devuelve el backend (GET /incidencias, /incidencias/{id}).
  * Mismos campos que IncidentDto en la app Android.
- *
- * `assignedTo` / `assignedToName` NO existen todavía en el backend: se dejan
- * aquí ya tipados (opcionales) para no tener que tocar este modelo cuando se
- * implemente el reparto de incidencias a operarios (ver README, sección
- * "Roadmap"). Hasta entonces siempre llegarán como `undefined`.
  */
 export interface Incident {
   id: string
@@ -39,9 +34,9 @@ export interface Incident {
   resolutionPhotoUrl?: string | null
   resolutionNote?: string | null
   municipalityId?: string | null
-  /** Preparado para el futuro reparto de trabajo. Aún no lo envía el backend. */
+  /** Id del operario asignado, o null/undefined si no está asignada. */
   assignedTo?: string | null
-  /** Preparado para el futuro reparto de trabajo. Aún no lo envía el backend. */
+  /** Nombre del operario asignado, resuelto por el backend para no tener que cruzarlo aquí. */
   assignedToName?: string | null
 }
 
@@ -54,4 +49,8 @@ export interface IncidentFilters {
   status?: IncidentStatus
   category?: IncidentCategory
   municipalityId?: string
+}
+
+export interface AssignIncidentRequest {
+  operatorId: string
 }

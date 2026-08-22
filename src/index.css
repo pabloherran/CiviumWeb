@@ -14,6 +14,8 @@
   --color-danger-bg: #ffdad6; /* BrandErrorContainer */
   --color-open: #b45309;
   --color-open-bg: #fef3c7;
+  --color-in-progress: #1d4ed8;
+  --color-in-progress-bg: #dbeafe;
   --color-resolved: #166534;
   --color-resolved-bg: #dcfce7;
   --radius: 8px;
@@ -441,6 +443,11 @@ code {
 .badge-resolved {
   background: var(--color-resolved-bg);
   color: var(--color-resolved);
+}
+
+.badge-in_progress {
+  background: var(--color-in-progress-bg);
+  color: var(--color-in-progress);
 }
 
 /* Estado de un usuario (activo/inactivo) — mismos tonos que arriba pero con

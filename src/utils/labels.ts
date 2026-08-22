@@ -19,6 +19,7 @@ export const CATEGORY_LABELS: Record<IncidentCategory, string> = {
 
 export const STATUS_LABELS: Record<IncidentStatus, string> = {
   OPEN: 'Abierta',
+  IN_PROGRESS: 'En resolución',
   RESOLVED: 'Resuelta',
 }
 
