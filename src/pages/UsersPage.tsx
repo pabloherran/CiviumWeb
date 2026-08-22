@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import {
   createInvitation,
   deleteInvitation,
@@ -27,7 +27,7 @@ export function UsersPage() {
   const bumpRefresh = () => setRefreshToken((v) => v + 1)
 
   return (
-    <div>
+    <div className="users-page">
       <div className="page-header">
         <h1>Usuarios</h1>
       </div>
@@ -79,6 +79,12 @@ function UsersTable({
   } | null>(null)
   const [offboardIne, setOffboardIne] = useState<string | null>(null)
 
+  // Nombre de municipio resuelto a partir del código INE, igual que en el
+  // listado de incidencias: se pide por provincia (2 primeros dígitos del
+  // INE) y se cachea para no repetir peticiones ya hechas.
+  const [municipalityNames, setMunicipalityNames] = useState<Record<string, string>>({})
+  const loadedProvinces = useRef<Set<string>>(new Set())
+
   function reload() {
     setLoading(true)
     listUsers()
@@ -88,6 +94,29 @@ function UsersTable({
   }
 
   useEffect(reload, [refreshToken])
+
+  useEffect(() => {
+    const provinceCodes = new Set(
+      users
+        .map((u) => u.municipalityId)
+        .filter((id): id is string => !!id && id.length >= 2)
+        .map((id) => id.slice(0, 2)),
+    )
+    const pending = [...provinceCodes].filter((code) => !loadedProvinces.current.has(code))
+    if (pending.length === 0) return
+
+    pending.forEach((code) => loadedProvinces.current.add(code))
+    Promise.all(pending.map((code) => searchMunicipalities(code, '', 10000).catch(() => [])))
+      .then((results) => {
+        setMunicipalityNames((prev) => {
+          const next = { ...prev }
+          results.flat().forEach((m) => {
+            next[m.ineCode] = m.nombre
+          })
+          return next
+        })
+      })
+  }, [users])
 
   async function toggleActive(target: User) {
     try {
@@ -129,6 +158,7 @@ function UsersTable({
             <th>Nombre</th>
             <th>Email</th>
             <th>Rol</th>
+            <th>Código INE</th>
             <th>Municipio</th>
             <th>Estado</th>
             <th></th>
@@ -141,6 +171,7 @@ function UsersTable({
               <td>{u.email}</td>
               <td>{ROLE_LABELS[u.role]}</td>
               <td>{u.municipalityId ?? '—'}</td>
+              <td>{u.municipalityId ? (municipalityNames[u.municipalityId] ?? '…') : '—'}</td>
               <td>
                 <span className={`badge ${u.active ? 'badge-active' : 'badge-inactive'}`}>
                   {u.active ? 'Activo' : 'Inactivo'}
@@ -162,7 +193,7 @@ function UsersTable({
           ))}
           {users.length === 0 && (
             <tr>
-              <td colSpan={6} className="table-empty">
+              <td colSpan={7} className="table-empty">
                 Todavía no hay operarios ni administradores dados de alta.
               </td>
             </tr>

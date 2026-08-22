@@ -132,6 +132,14 @@ code {
   max-width: 1200px;
 }
 
+/* El listado de incidencias y la pantalla de usuarios aprovechan todo el
+   ancho disponible: tienen tablas con varias columnas y el límite de
+   1200px las dejaba comprimidas en pantallas anchas. */
+.content:has(.incidents-page),
+.content:has(.users-page) {
+  max-width: none;
+}
+
 /* Login */
 
 .login-screen {
