@@ -259,8 +259,8 @@ code {
 
 .btn-ghost {
   background: transparent;
-  color: var(--color-text-muted);
-  border-color: var(--color-border);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
   width: 100%;
 }
 
