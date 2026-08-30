@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { ROLE_LABELS } from '../utils/labels'
 import civiumWordmark from '../assets/civium-wordmark.png'
 
-const navItems = [
+const baseNavItems = [
   { to: '/incidencias', label: 'Incidencias' },
   { to: '/mapa', label: 'Mapa' },
   { to: '/usuarios', label: 'Usuarios' },
@@ -11,6 +11,10 @@ const navItems = [
 
 export function Layout() {
   const { user, logout } = useAuth()
+  const navItems =
+    user?.role === 'SUPER_ADMIN'
+      ? [...baseNavItems, { to: '/municipios-cliente', label: 'Municipios cliente' }]
+      : baseNavItems
 
   return (
     <div className="app-shell">

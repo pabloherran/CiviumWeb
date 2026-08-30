@@ -135,7 +135,8 @@ code {
    ancho disponible: tienen tablas con varias columnas y el límite de
    1200px las dejaba comprimidas en pantallas anchas. */
 .content:has(.incidents-page),
-.content:has(.users-page) {
+.content:has(.users-page),
+.content:has(.client-municipalities-page) {
   max-width: none;
 }
 

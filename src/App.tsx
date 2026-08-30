@@ -7,6 +7,7 @@ import { IncidentsListPage } from './pages/IncidentsListPage'
 import { IncidentDetailPage } from './pages/IncidentDetailPage'
 import { IncidentsMapPage } from './pages/IncidentsMapPage'
 import { UsersPage } from './pages/UsersPage'
+import { ClientMunicipalitiesPage } from './pages/ClientMunicipalitiesPage'
 
 export default function App() {
   return (
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/incidencias/:id" element={<IncidentDetailPage />} />
           <Route path="/mapa" element={<IncidentsMapPage />} />
           <Route path="/usuarios" element={<UsersPage />} />
+          <Route path="/municipios-cliente" element={<ClientMunicipalitiesPage />} />
           <Route path="/" element={<Navigate to="/incidencias" replace />} />
         </Route>
 

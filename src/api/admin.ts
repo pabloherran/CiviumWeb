@@ -60,3 +60,14 @@ export async function createInvitation(body: CreateInvitationRequest): Promise<I
 export async function deleteInvitation(id: string): Promise<void> {
   await apiClient.delete(`admin/invitations/${id}`)
 }
+
+/**
+ * Municipios "cliente": los que tienen al menos un MUNICIPAL_ADMIN activo
+ * ahora mismo. Se calcula al vuelo en el backend contra la tabla de
+ * usuarios (no hay tabla ni flag propios que mantener sincronizados).
+ * Solo SUPER_ADMIN puede llamarlo.
+ */
+export async function getClientMunicipalities(): Promise<string[]> {
+  const { data } = await apiClient.get<string[]>('admin/municipios-cliente')
+  return data
+}
