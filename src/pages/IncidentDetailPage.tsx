@@ -8,6 +8,7 @@ import { StatusBadge } from '../components/StatusBadge'
 import type { Incident } from '../types/incident'
 import type { User } from '../types/user'
 import { CATEGORY_LABELS, formatDate } from '../utils/labels'
+import { getErrorMessage } from '../api/errors'
 
 /**
  * Detalle de incidencia: SOLO lectura para MUNICIPAL_ADMIN/SUPER_ADMIN, los
@@ -30,7 +31,7 @@ export function IncidentDetailPage() {
     setError(null)
     getIncidentById(id)
       .then(setIncident)
-      .catch(() => setError('No se ha podido cargar la incidencia.'))
+      .catch((err) => setError(getErrorMessage(err, 'No se ha podido cargar la incidencia.')))
       .finally(() => setLoading(false))
   }, [id])
 
@@ -145,7 +146,7 @@ function AssignmentPanel({
     setLoadingOperators(true)
     listUsers(incident.municipalityId ?? undefined)
       .then((users) => setOperators(users.filter((u) => u.role === 'OPERATOR' && u.active)))
-      .catch(() => setError('No se han podido cargar los operarios de este municipio.'))
+      .catch((err) => setError(getErrorMessage(err, 'No se han podido cargar los operarios de este municipio.')))
       .finally(() => setLoadingOperators(false))
   }, [incident.municipalityId])
 
@@ -157,8 +158,8 @@ function AssignmentPanel({
       const updated = await assignIncident(incident.id, selected)
       onChanged(updated)
       setSelected('')
-    } catch {
-      setError('No se ha podido asignar la incidencia.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido asignar la incidencia.'))
     } finally {
       setSaving(false)
     }
@@ -171,8 +172,8 @@ function AssignmentPanel({
       const updated = await unassignIncident(incident.id)
       onChanged(updated)
       setConfirmUnassign(false)
-    } catch {
-      setError('No se ha podido quitar la asignación.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido quitar la asignación.'))
     } finally {
       setSaving(false)
     }

@@ -14,6 +14,7 @@ import { useAuth } from '../context/AuthContext'
 import type { CreateInvitationRequest, Invitation, User, UserRole } from '../types/user'
 import type { Municipality, Province } from '../types/municipality'
 import { INVITATION_STATUS_LABELS, ROLE_LABELS, formatDate } from '../utils/labels'
+import { getErrorMessage } from '../api/errors'
 
 type Tab = 'users' | 'invitations'
 
@@ -89,7 +90,7 @@ function UsersTable({
     setLoading(true)
     listUsers()
       .then(setUsers)
-      .catch(() => setError('No se han podido cargar los usuarios.'))
+      .catch((err) => setError(getErrorMessage(err, 'No se han podido cargar los usuarios.')))
       .finally(() => setLoading(false))
   }
 
@@ -122,8 +123,8 @@ function UsersTable({
     try {
       await setUserActive(target.id, !target.active)
       reload()
-    } catch {
-      setError('No se ha podido actualizar el estado del usuario.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido actualizar el estado del usuario.'))
     }
   }
 
@@ -139,8 +140,8 @@ function UsersTable({
       if (resp.remainingAdmins === 0 && orphans > 0 && resp.municipalityId) {
         setLastAdminInfo({ municipalityId: resp.municipalityId, orphanOperators: orphans })
       }
-    } catch {
-      setError('No se ha podido eliminar el usuario.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido eliminar el usuario.'))
     } finally {
       setDeleting(false)
     }
@@ -525,7 +526,7 @@ function InvitationsPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     setLoading(true)
     listInvitations()
       .then(setInvitations)
-      .catch(() => setError('No se han podido cargar las invitaciones.'))
+      .catch((err) => setError(getErrorMessage(err, 'No se han podido cargar las invitaciones.')))
       .finally(() => setLoading(false))
   }
 
@@ -545,8 +546,8 @@ function InvitationsPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
       setEmail('')
       setMunicipalityId('')
       reload()
-    } catch {
-      setError('No se ha podido crear la invitación. Revisa los datos.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido crear la invitación. Revisa los datos.'))
     } finally {
       setSubmitting(false)
     }
@@ -556,8 +557,8 @@ function InvitationsPanel({ isSuperAdmin }: { isSuperAdmin: boolean }) {
     try {
       await deleteInvitation(id)
       reload()
-    } catch {
-      setError('No se ha podido revocar la invitación.')
+    } catch (err) {
+      setError(getErrorMessage(err, 'No se ha podido revocar la invitación.'))
     }
   }
 

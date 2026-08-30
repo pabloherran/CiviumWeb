@@ -2,6 +2,7 @@ import { type FormEvent, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import civiumWordmark from '../assets/civium-wordmark.png'
+import { getErrorMessage } from '../api/errors'
 
 export function LoginPage() {
   const { user, login } = useAuth()
@@ -25,11 +26,7 @@ export function LoginPage() {
       await login(email, password)
       navigate('/incidencias', { replace: true })
     } catch (err) {
-      const message =
-        err instanceof Error && !('response' in err)
-          ? err.message
-          : 'No se ha podido iniciar sesión. Comprueba el email y la contraseña.'
-      setError(message)
+      setError(getErrorMessage(err, 'No se ha podido iniciar sesión. Comprueba el email y la contraseña.'))
     } finally {
       setSubmitting(false)
     }

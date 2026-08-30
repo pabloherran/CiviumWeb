@@ -6,6 +6,7 @@ import { StatusBadge } from '../components/StatusBadge'
 import type { Incident, IncidentCategory, IncidentStatus } from '../types/incident'
 import { CATEGORY_LABELS, formatDate } from '../utils/labels'
 import { useAuth } from '../context/AuthContext'
+import { getErrorMessage } from '../api/errors'
 
 const STATUS_OPTIONS: Array<{ value: IncidentStatus | 'ALL'; label: string }> = [
   { value: 'OPEN', label: 'Abiertas' },
@@ -40,8 +41,8 @@ export function IncidentsListPage() {
       .then((data) => {
         if (!cancelled) setItems(data)
       })
-      .catch(() => {
-        if (!cancelled) setError('No se han podido cargar las incidencias.')
+      .catch((err) => {
+        if (!cancelled) setError(getErrorMessage(err, 'No se han podido cargar las incidencias.'))
       })
       .finally(() => {
         if (!cancelled) setLoading(false)
