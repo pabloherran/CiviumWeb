@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import civiumWordmark from '../assets/civium-wordmark.png'
 import { getErrorMessage } from '../api/errors'
@@ -65,6 +65,10 @@ export function LoginPage() {
         <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? 'Entrando…' : 'Entrar'}
         </button>
+
+        <Link to="/recuperar-contrasena" className="btn-link" style={{ alignSelf: 'center' }}>
+          ¿Olvidaste tu contraseña?
+        </Link>
 
         <p className="login-hint">
           Acceso exclusivo para administradores municipales y superadministradores.

@@ -6,16 +6,21 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { login as loginRequest } from '../api/auth'
+import { login as loginRequest, register as registerRequest } from '../api/auth'
 import { TOKEN_STORAGE_KEY } from '../api/client'
+import type { AuthRegisterRequest } from '../types/auth'
 import type { User } from '../types/user'
 
 const USER_STORAGE_KEY = 'civium_portal_user'
+
+const ROLE_MISMATCH_MESSAGE =
+  'Este portal es solo para administradores municipales. Tu cuenta no tiene ese rol.'
 
 interface AuthContextValue {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
+  register: (body: AuthRegisterRequest) => Promise<void>
   logout: () => void
 }
 
@@ -46,9 +51,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async login(email: string, password: string) {
         const response = await loginRequest({ email, password })
         if (response.user.role !== 'MUNICIPAL_ADMIN' && response.user.role !== 'SUPER_ADMIN') {
-          throw new Error(
-            'Este portal es solo para administradores municipales. Tu cuenta no tiene ese rol.',
-          )
+          throw new Error(ROLE_MISMATCH_MESSAGE)
+        }
+        localStorage.setItem(TOKEN_STORAGE_KEY, response.token)
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(response.user))
+        setUser(response.user)
+      },
+      // Usado por AcceptInvitationPage: crea la cuenta con el código de
+      // invitación y, si el rol otorgado es el correcto, deja al usuario
+      // logueado igual que login() — sin pedirle credenciales de nuevo.
+      async register(body: AuthRegisterRequest) {
+        const response = await registerRequest(body)
+        if (response.user.role !== 'MUNICIPAL_ADMIN' && response.user.role !== 'SUPER_ADMIN') {
+          throw new Error(ROLE_MISMATCH_MESSAGE)
         }
         localStorage.setItem(TOKEN_STORAGE_KEY, response.token)
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(response.user))
