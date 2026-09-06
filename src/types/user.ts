@@ -41,6 +41,12 @@ export interface DeleteUserResponse {
    */
   remainingAdmins?: number | null
   orphanOperators?: number | null
+  /**
+   * Incidencias EN_PROGRESO que se quedan sin operario asignado tras el
+   * borrado. Solo viene informado cuando el usuario borrado era OPERATOR
+   * (hallazgo 1.5 de la revisión MVP).
+   */
+  orphanedIncidents?: number | null
 }
 
 /** Respuesta de DELETE /admin/municipalities/{ine}/users. */

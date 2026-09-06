@@ -78,6 +78,7 @@ function UsersTable({
     municipalityId: string
     orphanOperators: number
   } | null>(null)
+  const [orphanedIncidents, setOrphanedIncidents] = useState<number | null>(null)
   const [offboardIne, setOffboardIne] = useState<string | null>(null)
 
   // Nombre de municipio resuelto a partir del código INE, igual que en el
@@ -139,6 +140,9 @@ function UsersTable({
       const orphans = resp.orphanOperators ?? 0
       if (resp.remainingAdmins === 0 && orphans > 0 && resp.municipalityId) {
         setLastAdminInfo({ municipalityId: resp.municipalityId, orphanOperators: orphans })
+      }
+      if (resp.orphanedIncidents && resp.orphanedIncidents > 0) {
+        setOrphanedIncidents(resp.orphanedIncidents)
       }
     } catch (err) {
       setError(getErrorMessage(err, 'No se ha podido eliminar el usuario.'))
@@ -254,6 +258,24 @@ function UsersTable({
             Era el último administrador del municipio <strong>{lastAdminInfo.municipalityId}</strong>.
             Quedan {lastAdminInfo.orphanOperators} operario(s) sin gestión. ¿Quieres dar de baja el
             municipio completo?
+          </p>
+        </Modal>
+      )}
+
+      {orphanedIncidents !== null && (
+        <Modal
+          title="Incidencias sin operario"
+          onClose={() => setOrphanedIncidents(null)}
+          actions={
+            <button className="btn btn-primary" onClick={() => setOrphanedIncidents(null)}>
+              Entendido
+            </button>
+          }
+        >
+          <p>
+            El operario tenía <strong>{orphanedIncidents}</strong> incidencia(s) en resolución. Se
+            conservan tal cual, pero han quedado sin nadie asignado: revísalas y reasígnalas cuanto
+            antes.
           </p>
         </Modal>
       )}
