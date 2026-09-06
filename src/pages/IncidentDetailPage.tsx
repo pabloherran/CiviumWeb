@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { listUsers } from '../api/admin'
 import {
   assignIncident,
+  deleteIncident,
   getIncidentById,
   setIncidentResolved,
   unassignIncident,
@@ -10,6 +11,7 @@ import {
 import { AuthenticatedImage } from '../components/AuthenticatedImage'
 import { Modal } from '../components/Modal'
 import { StatusBadge } from '../components/StatusBadge'
+import { useAuth } from '../context/AuthContext'
 import type { Incident } from '../types/incident'
 import type { User } from '../types/user'
 import { CATEGORY_LABELS, formatDate } from '../utils/labels'
@@ -17,18 +19,23 @@ import { getErrorMessage } from '../api/errors'
 
 /**
  * Detalle de incidencia: SOLO lectura para MUNICIPAL_ADMIN/SUPER_ADMIN, los
- * únicos roles que acceden al portal, salvo dos acciones sobre el estado:
- * asignar/reasignar/quitar operario, y reabrir una incidencia ya resuelta
- * (punto 1.3 de la revisión MVP — backend y Android ya lo soportaban desde
- * CIVIUM 0.9.9.4/0.9.9.6, faltaba aquí). No se ofrece resolver ni borrar:
- * eso sigue siendo cosa del operario sobre el terreno, en la app Android.
+ * únicos roles que acceden al portal, salvo estas acciones sobre el
+ * estado: asignar/reasignar/quitar operario, reabrir una incidencia ya
+ * resuelta, y eliminarla (SUPER_ADMIN en cualquier estado; MUNICIPAL_ADMIN
+ * solo si está resuelta — el backend es quien impone esta regla, aquí solo
+ * se oculta el botón cuando no aplica). No se ofrece resolver: eso sigue
+ * siendo cosa del operario sobre el terreno, en la app Android.
  */
 export function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [incident, setIncident] = useState<Incident | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     if (!id) return
@@ -47,6 +54,26 @@ export function IncidentDetailPage() {
   if (loading) return <p className="hint">Cargando incidencia…</p>
   if (error && !incident) return <div className="form-error">{error}</div>
   if (!incident) return null
+
+  // El backend es quien impone la regla real (SUPER_ADMIN cualquier
+  // estado, MUNICIPAL_ADMIN solo resueltas y de su propio municipio); esto
+  // es solo para no mostrar un botón que el servidor rechazaría.
+  const canDelete =
+    user?.role === 'SUPER_ADMIN' ||
+    (user?.role === 'MUNICIPAL_ADMIN' && incident.status === 'RESOLVED')
+
+  async function handleDelete() {
+    if (!incident) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await deleteIncident(incident.id)
+      navigate('/incidencias')
+    } catch (err) {
+      setDeleteError(getErrorMessage(err, 'No se ha podido eliminar la incidencia.'))
+      setDeleting(false)
+    }
+  }
 
   return (
     <div>
@@ -123,6 +150,52 @@ export function IncidentDetailPage() {
         )}
 
         <AssignmentPanel incident={incident} onChanged={setIncident} />
+
+        {canDelete && (
+          <section className="card">
+            <h2>Eliminar incidencia</h2>
+            <p className="hint">
+              Esta acción no se puede deshacer: la incidencia y sus fotos se eliminarán
+              permanentemente.
+            </p>
+            {deleteError && <div className="form-error">{deleteError}</div>}
+            <div className="row-actions">
+              <button
+                className="btn-link-danger"
+                onClick={() => setConfirmDelete(true)}
+                disabled={deleting}
+              >
+                Eliminar incidencia
+              </button>
+            </div>
+
+            {confirmDelete && (
+              <Modal
+                title="Eliminar incidencia"
+                onClose={() => !deleting && setConfirmDelete(false)}
+                actions={
+                  <>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setConfirmDelete(false)}
+                      disabled={deleting}
+                    >
+                      Cancelar
+                    </button>
+                    <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+                      {deleting ? 'Eliminando…' : 'Eliminar definitivamente'}
+                    </button>
+                  </>
+                }
+              >
+                <p>
+                  Vas a eliminar <strong>{incident.title}</strong> de forma permanente. Esta
+                  acción no se puede deshacer.
+                </p>
+              </Modal>
+            )}
+          </section>
+        )}
       </div>
     </div>
   )
