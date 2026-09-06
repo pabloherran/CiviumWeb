@@ -397,6 +397,67 @@ code {
   font-weight: 600;
 }
 
+/* Multiselect (categorías) — <details>/<summary> nativo, sin JS de apertura/cierre */
+
+.multiselect {
+  position: relative;
+}
+
+.multiselect-summary {
+  list-style: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 9px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  user-select: none;
+}
+
+.multiselect-summary::-webkit-details-marker {
+  display: none;
+}
+
+.multiselect-summary::after {
+  content: '▾';
+  float: right;
+  color: var(--color-text-muted);
+  margin-left: 8px;
+}
+
+.multiselect-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  min-width: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.multiselect-option:hover {
+  background: var(--color-surface-raised);
+}
+
 /* Table */
 
 .table {

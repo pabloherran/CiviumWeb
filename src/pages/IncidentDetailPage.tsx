@@ -68,7 +68,11 @@ export function IncidentDetailPage() {
     setDeleteError(null)
     try {
       await deleteIncident(incident.id)
-      navigate('/incidencias')
+      // Volver atrás (mismo patrón que el botón "← Volver" de esta pantalla)
+      // en vez de navegar a "/incidencias" a secas: como el listado guarda
+      // sus filtros en la URL, esto te devuelve exactamente a la pestaña de
+      // estado y al filtro de INE/categorías que tenías antes de entrar.
+      navigate(-1)
     } catch (err) {
       setDeleteError(getErrorMessage(err, 'No se ha podido eliminar la incidencia.'))
       setDeleting(false)

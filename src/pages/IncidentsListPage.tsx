@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { getIncidents } from '../api/incidents'
 import { searchMunicipalities } from '../api/municipalities'
 import { StatusBadge } from '../components/StatusBadge'
@@ -17,15 +17,44 @@ const STATUS_OPTIONS: Array<{ value: IncidentStatus | 'ALL'; label: string }> = 
 
 const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as Array<[IncidentCategory, string]>
 
+/**
+ * Los tres filtros (estado, categorías, código INE) viven en la URL
+ * (?status=&categories=&municipio=) en vez de en useState local. Así
+ * sobreviven a que el componente se desmonte y vuelva a montar — por
+ * ejemplo al entrar al detalle de una incidencia y volver, o al borrarla
+ * (ver IncidentDetailPage.tsx, que ahora usa navigate(-1) para volver
+ * exactamente a esta misma URL con estos mismos filtros — antes volvía
+ * siempre a "/incidencias" a secas, perdiéndolos).
+ */
 export function IncidentsListPage() {
   const { user } = useAuth()
   const [items, setItems] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [statusFilter, setStatusFilter] = useState<IncidentStatus | 'ALL'>('OPEN')
-  const [categoryFilter, setCategoryFilter] = useState<IncidentCategory | 'ALL'>('ALL')
-  const [municipalityFilter, setMunicipalityFilter] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const statusFilter = (searchParams.get('status') as IncidentStatus | 'ALL' | null) ?? 'OPEN'
+  const municipalityFilter = searchParams.get('municipio') ?? ''
+  const categoryFilter = useMemo(() => {
+    const raw = searchParams.get('categories')
+    return new Set<IncidentCategory>(raw ? (raw.split(',').filter(Boolean) as IncidentCategory[]) : [])
+  }, [searchParams])
+
+  /** Actualiza uno o varios filtros en la URL sin apilar historial (replace). */
+  function updateFilters(patch: Record<string, string | null>) {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        Object.entries(patch).forEach(([key, value]) => {
+          if (!value) next.delete(key)
+          else next.set(key, value)
+        })
+        return next
+      },
+      { replace: true },
+    )
+  }
 
   // Nombre de municipio resuelto a partir del código INE, para no mostrar solo
   // el código en la tabla. Se resuelve por provincia (2 primeros dígitos del
@@ -77,7 +106,7 @@ export function IncidentsListPage() {
 
   const visibleItems = useMemo(() => {
     return items.filter((inc) => {
-      const matchesCategory = categoryFilter === 'ALL' || inc.category === categoryFilter
+      const matchesCategory = categoryFilter.size === 0 || categoryFilter.has(inc.category)
       const matchesMunicipality =
         !municipalityFilter ||
         (inc.municipalityId ?? '').toLowerCase().includes(municipalityFilter.toLowerCase())
@@ -102,32 +131,26 @@ export function IncidentsListPage() {
             <button
               key={opt.value}
               className={`chip${statusFilter === opt.value ? ' chip-active' : ''}`}
-              onClick={() => setStatusFilter(opt.value)}
+              onClick={() => updateFilters({ status: opt.value === 'OPEN' ? null : opt.value })}
             >
               {opt.label}
             </button>
           ))}
         </div>
 
-        <select
-          className="select"
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value as IncidentCategory | 'ALL')}
-        >
-          <option value="ALL">Todas las categorías</option>
-          {CATEGORY_OPTIONS.map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+        <CategoryMultiSelect
+          selected={categoryFilter}
+          onChange={(next) =>
+            updateFilters({ categories: next.size > 0 ? Array.from(next).join(',') : null })
+          }
+        />
 
         {user?.role === 'SUPER_ADMIN' && (
           <input
             className="input"
             placeholder="Código INE de municipio…"
             value={municipalityFilter}
-            onChange={(e) => setMunicipalityFilter(e.target.value)}
+            onChange={(e) => updateFilters({ municipio: e.target.value || null })}
           />
         )}
       </div>
@@ -177,5 +200,59 @@ export function IncidentsListPage() {
         </table>
       )}
     </div>
+  )
+}
+
+/**
+ * Desplegable de categorías con selección múltiple, mediante <details>/
+ * <summary> nativos (sin dependencias ni JS de apertura/cierre a mano).
+ * Vacío = "todas las categorías" (mismo significado que antes tenía la
+ * opción "ALL" del <select> de selección única que sustituye).
+ */
+function CategoryMultiSelect({
+  selected,
+  onChange,
+}: {
+  selected: Set<IncidentCategory>
+  onChange: (next: Set<IncidentCategory>) => void
+}) {
+  const summary =
+    selected.size === 0
+      ? 'Todas las categorías'
+      : selected.size === 1
+        ? CATEGORY_LABELS[[...selected][0]]
+        : `${selected.size} categorías`
+
+  function toggle(cat: IncidentCategory, checked: boolean) {
+    const next = new Set(selected)
+    if (checked) next.add(cat)
+    else next.delete(cat)
+    onChange(next)
+  }
+
+  return (
+    <details className="multiselect">
+      <summary className="multiselect-summary">{summary}</summary>
+      <div className="multiselect-panel">
+        <label className="multiselect-option">
+          <input
+            type="checkbox"
+            checked={selected.size === 0}
+            onChange={() => onChange(new Set())}
+          />
+          Todas las categorías
+        </label>
+        {CATEGORY_OPTIONS.map(([value, label]) => (
+          <label key={value} className="multiselect-option">
+            <input
+              type="checkbox"
+              checked={selected.has(value)}
+              onChange={(e) => toggle(value, e.target.checked)}
+            />
+            {label}
+          </label>
+        ))}
+      </div>
+    </details>
   )
 }
