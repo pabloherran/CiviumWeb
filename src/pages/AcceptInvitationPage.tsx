@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import civiumWordmark from '../assets/civium-wordmark.png'
 import { getErrorMessage } from '../api/errors'
@@ -20,7 +20,7 @@ import { getErrorMessage } from '../api/errors'
  * contraseña otra vez en `/login`.
  */
 export function AcceptInvitationPage() {
-  const { user, register } = useAuth()
+  const { user, register, logout } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
 
@@ -35,8 +35,32 @@ export function AcceptInvitationPage() {
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
+  // Si ya hay una sesión abierta en este navegador (p. ej. el propio admin
+  // que creó la invitación, probando el enlace), no la pisamos en
+  // silencio: se lo decimos y le dejamos elegir cerrarla para poder
+  // aceptar la invitación con la cuenta nueva, en vez de mandarlo sin
+  // explicación a /incidencias.
   if (user) {
-    return <Navigate to="/incidencias" replace />
+    return (
+      <div className="login-screen">
+        <div className="login-card">
+          <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
+          <p className="login-subtitle">Ya tienes una sesión iniciada</p>
+          <p className="login-hint">
+            Has entrado en el portal con la cuenta <strong>{user.email}</strong>. Para aceptar
+            esta invitación con otra cuenta, cierra sesión primero.
+          </p>
+
+          <button className="btn btn-primary" type="button" onClick={logout}>
+            Cerrar sesión y continuar
+          </button>
+
+          <p className="login-hint">
+            <Link to="/incidencias">Seguir con mi sesión actual</Link>
+          </p>
+        </div>
+      </div>
+    )
   }
 
   async function handleSubmit(e: FormEvent) {

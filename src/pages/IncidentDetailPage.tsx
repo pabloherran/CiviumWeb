@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { listUsers } from '../api/admin'
-import { assignIncident, getIncidentById, unassignIncident } from '../api/incidents'
+import {
+  assignIncident,
+  getIncidentById,
+  setIncidentResolved,
+  unassignIncident,
+} from '../api/incidents'
 import { AuthenticatedImage } from '../components/AuthenticatedImage'
 import { Modal } from '../components/Modal'
 import { StatusBadge } from '../components/StatusBadge'
@@ -12,11 +17,11 @@ import { getErrorMessage } from '../api/errors'
 
 /**
  * Detalle de incidencia: SOLO lectura para MUNICIPAL_ADMIN/SUPER_ADMIN, los
- * únicos roles que acceden al portal, salvo la asignación de trabajo (su
- * única acción sobre el estado). No se ofrece resolver/reabrir/borrar
- * incidencias aquí: esos roles son gestores, no operarios sobre el terreno
- * (esa acción sigue existiendo en la app Android, y solo para el operario
- * al que se le haya asignado la incidencia).
+ * únicos roles que acceden al portal, salvo dos acciones sobre el estado:
+ * asignar/reasignar/quitar operario, y reabrir una incidencia ya resuelta
+ * (punto 1.3 de la revisión MVP — backend y Android ya lo soportaban desde
+ * CIVIUM 0.9.9.4/0.9.9.6, faltaba aquí). No se ofrece resolver ni borrar:
+ * eso sigue siendo cosa del operario sobre el terreno, en la app Android.
  */
 export function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -124,9 +129,17 @@ export function IncidentDetailPage() {
 }
 
 /**
- * Asignar/reasignar/quitar operario. Al asignar, la incidencia pasa a
- * "En resolución" (backend); al quitar la asignación, vuelve a "Abierta".
- * Una vez resuelta, ya no se puede tocar la asignación.
+ * Asignar/reasignar/quitar operario mientras la incidencia sigue abierta o
+ * en resolución. Al asignar, pasa a "En resolución" (backend); al quitar
+ * la asignación, vuelve a "Abierta".
+ *
+ * Una vez RESUELTA, esta misma tarjeta cambia de función: ya no se puede
+ * tocar la asignación, pero un MUNICIPAL_ADMIN/SUPER_ADMIN puede reabrirla
+ * (p. ej. si el operario que la resolvió ya no está disponible y hace
+ * falta revisarla de nuevo). El backend decide el estado destino según si
+ * la incidencia conserva operario asignado: con operario -> "En
+ * resolución" (sigue en su cola); sin operario -> "Abierta". Mismo
+ * criterio que ya usa la app Android (IncidentDetailScreen.kt).
  */
 function AssignmentPanel({
   incident,
@@ -141,6 +154,9 @@ function AssignmentPanel({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmUnassign, setConfirmUnassign] = useState(false)
+  const [confirmReopen, setConfirmReopen] = useState(false)
+  const [reopening, setReopening] = useState(false)
+  const [reopenError, setReopenError] = useState<string | null>(null)
 
   useEffect(() => {
     setLoadingOperators(true)
@@ -179,11 +195,75 @@ function AssignmentPanel({
     }
   }
 
+  async function handleReopen() {
+    setReopening(true)
+    setReopenError(null)
+    try {
+      const updated = await setIncidentResolved(incident.id, { resolved: false })
+      onChanged(updated)
+      setConfirmReopen(false)
+    } catch (err) {
+      setReopenError(getErrorMessage(err, 'No se ha podido reabrir la incidencia.'))
+    } finally {
+      setReopening(false)
+    }
+  }
+
   if (incident.status === 'RESOLVED') {
     return (
-      <section className="card card-disabled">
+      <section className="card">
         <h2>Asignación de trabajo</h2>
-        <p className="hint">Esta incidencia ya está resuelta; no se puede reasignar.</p>
+        <p className="hint">
+          Esta incidencia está resuelta
+          {incident.assignedToName ? (
+            <>
+              {' '}
+              — la resolvió <strong>{incident.assignedToName}</strong>
+            </>
+          ) : null}
+          . No se puede reasignar mientras siga resuelta.
+        </p>
+
+        {reopenError && <div className="form-error">{reopenError}</div>}
+
+        <div className="row-actions">
+          <button className="btn-link" onClick={() => setConfirmReopen(true)}>
+            Reabrir incidencia
+          </button>
+        </div>
+
+        {confirmReopen && (
+          <Modal
+            title="Reabrir incidencia"
+            onClose={() => !reopening && setConfirmReopen(false)}
+            actions={
+              <>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setConfirmReopen(false)}
+                  disabled={reopening}
+                >
+                  Cancelar
+                </button>
+                <button className="btn btn-primary" onClick={handleReopen} disabled={reopening}>
+                  {reopening ? 'Reabriendo…' : 'Reabrir'}
+                </button>
+              </>
+            }
+          >
+            <p>
+              La incidencia volverá a estado{' '}
+              {incident.assignedTo ? (
+                <>
+                  <strong>En resolución</strong>, con el mismo operario asignado
+                </>
+              ) : (
+                <strong>Abierta</strong>
+              )}
+              . Se perderán la foto y la nota de resolución.
+            </p>
+          </Modal>
+        )}
       </section>
     )
   }
