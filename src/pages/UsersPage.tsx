@@ -297,7 +297,7 @@ function UsersTable({
 /**
  * Zona de peligro visible solo para SUPER_ADMIN: baja completa de un
  * municipio (todos sus operarios y administradores de golpe), pensada para
- * cuando un ayuntamiento se da de baja del servicio.
+ * cuando un ayuntamiento se da de baja del servicio
  */
 function MunicipalityOffboardPanel({ onDone }: { onDone: () => void }) {
   const [provinces, setProvinces] = useState<Province[]>([])

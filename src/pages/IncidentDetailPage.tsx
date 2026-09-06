@@ -25,6 +25,14 @@ import { getErrorMessage } from '../api/errors'
  * solo si está resuelta — el backend es quien impone esta regla, aquí solo
  * se oculta el botón cuando no aplica). No se ofrece resolver: eso sigue
  * siendo cosa del operario sobre el terreno, en la app Android.
+ *
+ * Layout: columna izquierda fija (sticky) con todo lo administrativo —
+ * estado, detalle, ubicación, gestión y zona de peligro, de lo más seguro
+ * a lo más irreversible — y columna derecha con el reporte del ciudadano y
+ * la resolución, cada uno en su propia tarjeta con su foto. Las fotos las
+ * hace un móvil en vertical (3:4, 9:16, 9:21... según el modelo), así que
+ * ninguna tarjeta fuerza una proporción: la imagen conserva su alto
+ * natural (ver `.detail-photo` en index.css).
  */
 export function IncidentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -80,126 +88,139 @@ export function IncidentDetailPage() {
   }
 
   return (
-    <div>
+    <div className="incident-detail">
       <button className="btn-link" onClick={() => navigate(-1)}>
         ← Volver
       </button>
 
       <div className="page-header">
         <h1>{incident.title}</h1>
-        <StatusBadge status={incident.status} />
       </div>
 
-      <div className="detail-grid">
-        <section className="card">
-          <h2>Detalle</h2>
-          <dl className="definition-list">
-            <dt>Categoría</dt>
-            <dd>{CATEGORY_LABELS[incident.category]}</dd>
-            <dt>Municipio</dt>
-            <dd>{incident.municipalityId ?? '—'}</dd>
-            <dt>Creada</dt>
-            <dd>{formatDate(incident.createdAt)}</dd>
-            <dt>Creada por</dt>
-            <dd>{incident.createdBy}</dd>
-            {incident.assignedToName && (
-              <>
-                <dt>Asignada a</dt>
-                <dd>{incident.assignedToName}</dd>
-              </>
+      <div className="detail-layout">
+        <div
+          className={
+            incident.resolutionNote ? 'detail-photos' : 'detail-photos detail-photos--single'
+          }
+        >
+          <section className="card photo-card">
+            <h2>Reporte del ciudadano</h2>
+            {incident.reportPhotoUrl && (
+              <AuthenticatedImage
+                className="detail-photo"
+                src={incident.reportPhotoUrl}
+                alt="Foto del reporte"
+              />
             )}
-            {incident.resolvedBy && (
-              <>
-                <dt>Resuelta por</dt>
-                <dd>{incident.resolvedBy}</dd>
-              </>
-            )}
-          </dl>
-          <p className="detail-description">{incident.description}</p>
-        </section>
-
-        {(incident.latitude != null && incident.longitude != null) && (
-          <section className="card">
-            <h2>Ubicación</h2>
-            <p className="hint">
-              {incident.latitude?.toFixed(5)}, {incident.longitude?.toFixed(5)}
-            </p>
-            <Link className="btn-link" to={`/mapa?incidentId=${incident.id}`}>
-              Ver en el mapa →
-            </Link>
+            <p className="detail-description">{incident.description}</p>
           </section>
-        )}
 
-        {incident.reportPhotoUrl && (
-          <section className="card">
-            <h2>Foto del reporte</h2>
-            <AuthenticatedImage
-              className="detail-photo"
-              src={incident.reportPhotoUrl}
-              alt="Foto del reporte"
-            />
+          {incident.resolutionNote && (
+            <section className="card photo-card resolution-card">
+              <h2>✓ Resolución</h2>
+              {incident.resolutionPhotoUrl && (
+                <AuthenticatedImage
+                  className="detail-photo"
+                  src={incident.resolutionPhotoUrl}
+                  alt="Foto de resolución"
+                />
+              )}
+              <p className="detail-description">{incident.resolutionNote}</p>
+            </section>
+          )}
+        </div>
+
+        <aside className="detail-sidebar">
+          <section className="card status-card">
+            <StatusBadge status={incident.status} />
           </section>
-        )}
 
-        {incident.resolutionPhotoUrl && (
           <section className="card">
-            <h2>Foto de resolución</h2>
-            <AuthenticatedImage
-              className="detail-photo"
-              src={incident.resolutionPhotoUrl}
-              alt="Foto de resolución"
-            />
-            {incident.resolutionNote && <p className="hint">{incident.resolutionNote}</p>}
+            <h2>Detalle</h2>
+            <dl className="definition-list">
+              <dt>Categoría</dt>
+              <dd>{CATEGORY_LABELS[incident.category]}</dd>
+              <dt>Municipio</dt>
+              <dd>{incident.municipalityId ?? '—'}</dd>
+              <dt>Creada</dt>
+              <dd>{formatDate(incident.createdAt)}</dd>
+              <dt>Creada por</dt>
+              <dd>{incident.createdBy}</dd>
+              {incident.assignedToName && (
+                <>
+                  <dt>Asignada a</dt>
+                  <dd>{incident.assignedToName}</dd>
+                </>
+              )}
+              {incident.resolvedBy && (
+                <>
+                  <dt>Resuelta por</dt>
+                  <dd>{incident.resolvedBy}</dd>
+                </>
+              )}
+            </dl>
           </section>
-        )}
 
-        <AssignmentPanel incident={incident} onChanged={setIncident} />
+          {(incident.latitude != null && incident.longitude != null) && (
+            <section className="card">
+              <h2>Ubicación</h2>
+              <p className="hint">
+                {incident.latitude?.toFixed(5)}, {incident.longitude?.toFixed(5)}
+              </p>
+              <Link className="btn-link" to={`/mapa?incidentId=${incident.id}`}>
+                Ver en el mapa →
+              </Link>
+            </section>
+          )}
 
-        {canDelete && (
-          <section className="card">
-            <h2>Eliminar incidencia</h2>
-            <p className="hint">
-              Esta acción no se puede deshacer: la incidencia y sus fotos se eliminarán
-              permanentemente.
-            </p>
-            {deleteError && <div className="form-error">{deleteError}</div>}
-            <div className="row-actions">
-              <button
-                className="btn-link-danger"
-                onClick={() => setConfirmDelete(true)}
-                disabled={deleting}
-              >
-                Eliminar incidencia
-              </button>
-            </div>
+          <AssignmentPanel incident={incident} onChanged={setIncident} />
 
-            {confirmDelete && (
-              <Modal
-                title="Eliminar incidencia"
-                onClose={() => !deleting && setConfirmDelete(false)}
-                actions={
-                  <>
-                    <button
-                      className="btn btn-secondary"
-                      onClick={() => setConfirmDelete(false)}
-                      disabled={deleting}
-                    >
-                      Cancelar
-                    </button>
-                    <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
-                      {deleting ? 'Eliminando…' : 'Eliminar definitivamente'}
-                    </button>
-                  </>
-                }
-              >
-                <p>
-                  Vas a eliminar <strong>{incident.title}</strong> de forma permanente. Esta
-                  acción no se puede deshacer.
-                </p>
-              </Modal>
-            )}
-          </section>
-        )}
+          {canDelete && (
+            <section className="danger-zone">
+              <h2>Eliminar incidencia</h2>
+              <p className="hint">
+                Esta acción no se puede deshacer: la incidencia y sus fotos se eliminarán
+                permanentemente.
+              </p>
+              {deleteError && <div className="form-error">{deleteError}</div>}
+              <div className="row-actions">
+                <button
+                  className="btn-link-danger"
+                  onClick={() => setConfirmDelete(true)}
+                  disabled={deleting}
+                >
+                  Eliminar incidencia
+                </button>
+              </div>
+
+              {confirmDelete && (
+                <Modal
+                  title="Eliminar incidencia"
+                  onClose={() => !deleting && setConfirmDelete(false)}
+                  actions={
+                    <>
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => setConfirmDelete(false)}
+                        disabled={deleting}
+                      >
+                        Cancelar
+                      </button>
+                      <button className="btn btn-danger" onClick={handleDelete} disabled={deleting}>
+                        {deleting ? 'Eliminando…' : 'Eliminar definitivamente'}
+                      </button>
+                    </>
+                  }
+                >
+                  <p>
+                    Vas a eliminar <strong>{incident.title}</strong> de forma permanente. Esta
+                    acción no se puede deshacer.
+                  </p>
+                </Modal>
+              )}
+            </section>
+          )}
+        </aside>
       </div>
     </div>
   )
