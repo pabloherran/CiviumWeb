@@ -6,6 +6,7 @@ import civiumWordmark from '../assets/civium-wordmark.png'
 const baseNavItems = [
   { to: '/incidencias', label: 'Incidencias' },
   { to: '/mapa', label: 'Mapa' },
+  { to: '/estadisticas', label: 'Estadísticas' },
   { to: '/usuarios', label: 'Usuarios' },
 ]
 

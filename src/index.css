@@ -879,3 +879,226 @@ code {
   flex-direction: column;
   gap: 4px;
 }
+
+/* Estadísticas */
+
+.content:has(.statistics-page) {
+  max-width: none;
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.period-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.period-tab {
+  border: none;
+  background: none;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-family: inherit;
+}
+
+.period-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Fila de "filtros activos": resume de un vistazo la combinación aplicada
+   (p. ej. Aceras + Alumbrado + Resuelta), con opción de quitar uno a uno. */
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #eef1ff;
+  color: var(--color-primary-dark);
+  border-radius: 999px;
+  padding: 4px 8px 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.filter-pill-remove {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 2px;
+  line-height: 1;
+  opacity: 0.7;
+}
+
+.filter-pill-remove:hover {
+  opacity: 1;
+}
+
+/* KPIs */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.kpi-card {
+  text-align: center;
+}
+
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 4px 0;
+}
+
+.kpi-unit {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.kpi-label {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.kpi-sub {
+  font-size: 0.78rem;
+  color: var(--color-resolved);
+}
+
+.kpi-sub-muted {
+  color: var(--color-text-muted);
+}
+
+.kpi-sub-open {
+  color: var(--color-open);
+}
+
+/* Rejilla de gráficos: dos tarjetas por fila */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 960px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Barras horizontales (categorías) */
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 40px;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.bar-track {
+  background: var(--color-surface-raised);
+  border-radius: 4px;
+  height: 14px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+.bar-count {
+  text-align: right;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.bar-chart-note {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+}
+
+/* Gráfico de barras de periodo (SVG) */
+
+.line-chart-wrap {
+  padding-top: 4px;
+}
+
+/* Leyenda del donut de estado */
+
+.status-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+  font-size: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.status-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Ranking de operarios */
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.rank-badge.gold {
+  background: #fff3cd;
+  color: #946200;
+}

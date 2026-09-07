@@ -8,6 +8,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { IncidentsListPage } from './pages/IncidentsListPage'
 import { IncidentDetailPage } from './pages/IncidentDetailPage'
 import { IncidentsMapPage } from './pages/IncidentsMapPage'
+import { StatisticsPage } from './pages/StatisticsPage'
 import { UsersPage } from './pages/UsersPage'
 import { ClientMunicipalitiesPage } from './pages/ClientMunicipalitiesPage'
 
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/incidencias" element={<IncidentsListPage />} />
           <Route path="/incidencias/:id" element={<IncidentDetailPage />} />
           <Route path="/mapa" element={<IncidentsMapPage />} />
+          <Route path="/estadisticas" element={<StatisticsPage />} />
           <Route path="/usuarios" element={<UsersPage />} />
           <Route path="/municipios-cliente" element={<ClientMunicipalitiesPage />} />
           <Route path="/" element={<Navigate to="/incidencias" replace />} />
