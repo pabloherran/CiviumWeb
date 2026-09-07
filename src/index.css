@@ -370,21 +370,31 @@ code {
 
 .incident-detail > .btn-link {
   flex: 0 0 auto;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .incident-detail > .page-header {
   flex: 0 0 auto;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+/* Título un poco más pequeño solo en esta pantalla, para dejar más hueco
+   al layout de abajo. */
+.incident-detail .page-header h1 {
+  font-size: 1.3rem;
 }
 
 /* Layout del detalle: fotos como grupo a la izquierda (una al lado de la
    otra), resto de tarjetas (estado, detalle, ubicación, gestión, zona de
-   peligro) a la derecha. Ocupa todo el hueco que deja la cabecera. */
+   peligro) a la derecha. Ocupa todo el hueco que deja la cabecera.
+   minmax(0, 1fr) en vez de 1fr a secas: así la fila no puede crecer por
+   encima del hueco disponible aunque el contenido de dentro sea más alto
+   de lo esperado — se recorta al hueco (y cada tarjeta reparte lo suyo),
+   nunca empuja el alto de la página. */
 .detail-layout {
   display: grid;
   grid-template-columns: 1fr 320px;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 20px;
   height: 100%;
 }
@@ -392,7 +402,7 @@ code {
 .detail-photos {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 20px;
   height: 100%;
 }
@@ -443,26 +453,39 @@ code {
 .detail-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 5px;
   overflow-y: auto;
   min-height: 0;
+  font-size: 0.82rem;
 }
 
-/* Un poco más compactas que el resto del portal solo aquí, para que las
-   cinco tarjetas (estado, detalle, ubicación, asignación, zona de
-   peligro) quepan sin scroll interno en portátiles de 1366×768. */
+/* Bastante más compactas que el resto del portal solo aquí, para dejar
+   margen de sobra y que las cinco tarjetas (estado, detalle, ubicación,
+   asignación, zona de peligro) quepan cómodas incluso en una ventana más
+   baja de lo habitual. */
 .detail-sidebar .card,
 .detail-sidebar .danger-zone {
-  padding: 12px 16px;
+  padding: 7px 10px;
 }
 
 .detail-sidebar .card h2,
 .detail-sidebar .danger-zone h2 {
-  margin-bottom: 6px;
+  margin-bottom: 3px;
+  font-size: 0.88rem;
 }
 
 .detail-sidebar .definition-list {
-  gap: 3px 12px;
+  gap: 1px 10px;
+  font-size: 0.78rem;
+}
+
+.detail-sidebar .hint {
+  font-size: 0.76rem;
+}
+
+.detail-sidebar .danger-zone p {
+  font-size: 0.76rem;
+  margin: 0 0 6px;
 }
 
 .status-card {
