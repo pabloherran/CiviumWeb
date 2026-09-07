@@ -36,22 +36,44 @@ export function IncidentsMapPage() {
   const [selected, setSelected] = useState<Incident | null>(null)
 
   useEffect(() => {
-    // Sin filtro de estado en la petición: traemos todo y descartamos las
-    // resueltas aquí. Antes solo se pedían las OPEN, así que las incidencias
-    // "En resolución" (ya asignadas a un operario) no aparecían nunca en el
-    // mapa aunque tuvieran coordenadas.
+    // Se guarda la lista completa tal cual (sin descartar resueltas aquí):
+    // el filtro de "solo activas" se aplica más abajo, solo para decidir
+    // qué marcadores normales se pintan — así la incidencia que venga de
+    // ?incidentId= se puede seguir encontrando aunque esté resuelta.
     getIncidents()
-      .then((data) => setItems(data.filter((inc) => inc.status !== 'RESOLVED')))
+      .then(setItems)
       .catch(() => setItems([]))
   }, [])
 
+  // Marcadores "normales": incidencias activas (abiertas + en resolución),
+  // igual que antes. Las resueltas no se pintan aquí como puntos de color.
   const markers = useMemo(
-    () => items.filter((inc) => inc.latitude != null && inc.longitude != null),
+    () =>
+      items.filter(
+        (inc) => inc.status !== 'RESOLVED' && inc.latitude != null && inc.longitude != null,
+      ),
     [items],
   )
 
+  // La incidencia concreta que trae la URL (?incidentId=), sea cual sea su
+  // estado — se busca en la lista completa, no en `markers`, precisamente
+  // para que una incidencia resuelta también se encuentre.
+  const highlighted = useMemo(
+    () =>
+      items.find(
+        (inc) => inc.id === highlightedId && inc.latitude != null && inc.longitude != null,
+      ) ?? null,
+    [items, highlightedId],
+  )
+
+  // Si la incidencia destacada también está en `markers` (activa), se
+  // quita de ahí para no pintar dos pines superpuestos en el mismo punto.
+  const regularMarkers = useMemo(
+    () => markers.filter((m) => m.id !== highlighted?.id),
+    [markers, highlighted],
+  )
+
   const center = useMemo(() => {
-    const highlighted = markers.find((m) => m.id === highlightedId)
     if (highlighted) return { lat: highlighted.latitude!, lng: highlighted.longitude! }
     if (markers.length > 0) {
       const avgLat = markers.reduce((sum, m) => sum + (m.latitude ?? 0), 0) / markers.length
@@ -59,7 +81,18 @@ export function IncidentsMapPage() {
       return { lat: avgLat, lng: avgLng }
     }
     return SPAIN_CENTER
-  }, [markers, highlightedId])
+  }, [markers, highlighted])
+
+  // Zoom cercano (16, mismo nivel que ya usa Android para un único punto)
+  // cuando venimos a ver una incidencia concreta; si no, el criterio de
+  // siempre según cuántas incidencias activas hay.
+  const zoom = highlighted ? 16 : markers.length > 0 ? 12 : 5.5
+
+  // Abre automáticamente su ventana de información al llegar, para
+  // confirmar de un vistazo que es la incidencia correcta.
+  useEffect(() => {
+    if (highlighted) setSelected(highlighted)
+  }, [highlighted])
 
   if (!GOOGLE_MAPS_API_KEY) {
     return (
@@ -112,9 +145,9 @@ export function IncidentsMapPage() {
         <GoogleMap
           mapContainerStyle={containerStyle}
           center={center}
-          zoom={markers.length > 0 ? 12 : 5.5}
+          zoom={zoom}
         >
-          {markers.map((inc) => (
+          {regularMarkers.map((inc) => (
             <MarkerF
               key={inc.id}
               position={{ lat: inc.latitude!, lng: inc.longitude! }}
@@ -122,6 +155,18 @@ export function IncidentsMapPage() {
               onClick={() => setSelected(inc)}
             />
           ))}
+
+          {highlighted && (
+            // Sin `icon`: el pin rojo grande por defecto de Google, para
+            // que se distinga a simple vista de los puntos de color del
+            // resto — es "la incidencia a la que has venido a ver".
+            <MarkerF
+              key={highlighted.id}
+              position={{ lat: highlighted.latitude!, lng: highlighted.longitude! }}
+              zIndex={999}
+              onClick={() => setSelected(highlighted)}
+            />
+          )}
 
           {selected && (
             <InfoWindowF
