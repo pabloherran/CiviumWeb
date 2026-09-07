@@ -161,7 +161,7 @@ export function IncidentDetailPage() {
             <StatusBadge status={incident.status} />
           </section>
 
-          <section className="card">
+          <section className="card detail-card">
             <h2>Detalle</h2>
             <dl className="definition-list">
               <dt>Categoría</dt>
@@ -191,7 +191,9 @@ export function IncidentDetailPage() {
             <section className="card">
               <h2>Ubicación</h2>
               <p className="hint">
-                {incident.latitude?.toFixed(5)}, {incident.longitude?.toFixed(5)}
+                {incident.address?.trim()
+                  ? incident.address
+                  : `${incident.latitude?.toFixed(5)}, ${incident.longitude?.toFixed(5)}`}
               </p>
               <Link className="btn-link" to={`/mapa?incidentId=${incident.id}`}>
                 Ver en el mapa →

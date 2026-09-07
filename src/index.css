@@ -411,7 +411,6 @@ code {
    todavía) no dejamos un hueco vacío al lado. */
 .detail-photos--single {
   grid-template-columns: 1fr;
-  max-width: 480px;
 }
 
 /* Cada tarjeta de foto reparte su propio alto: título fijo arriba, foto
@@ -453,20 +452,39 @@ code {
 .detail-sidebar {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 5px;
+  gap: 10px;
   overflow-y: auto;
   min-height: 0;
   font-size: 0.82rem;
 }
 
-/* Bastante más compactas que el resto del portal solo aquí, para dejar
-   margen de sobra y que las cinco tarjetas (estado, detalle, ubicación,
-   asignación, zona de peligro) quepan cómodas incluso en una ventana más
-   baja de lo habitual. */
+/* Cada tarjeta crece para repartirse el alto sobrante (flex-grow), con su
+   contenido centrado verticalmente dentro — así "Estado" queda a la
+   altura de la parte más alta de las fotos y la última tarjeta (zona de
+   peligro o expediente) a la altura de la parte más baja. El peso de
+   crecimiento no es igual para todas: ver .status-card/.detail-card
+   más abajo, ajustado a cuánto contenido tiene cada una. */
 .detail-sidebar .card,
 .detail-sidebar .danger-zone {
-  padding: 7px 10px;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 14px;
+}
+
+/* "Estado" apenas tiene contenido (un badge) — no hace falta que crezca
+   tanto como las demás, o se queda con mucho hueco vacío. */
+.detail-sidebar .status-card {
+  flex-grow: 0.4;
+}
+
+/* "Detalle" es la que más contenido tiene (seis filas) — le damos más
+   parte proporcional del alto sobrante que al resto. Requiere la clase
+   .detail-card en la sección "Detalle" de IncidentDetailPage.tsx (ver
+   nota al principio de este documento). */
+.detail-sidebar .detail-card {
+  flex-grow: 1.8;
 }
 
 .detail-sidebar .card h2,
@@ -538,6 +556,14 @@ code {
   }
   .detail-sidebar {
     overflow-y: visible;
+  }
+  /* En móvil/tablet no tiene sentido que las tarjetas "crezcan" a fuerza
+     — vuelven a su tamaño natural y se apilan normal, como el resto del
+     portal en pantallas pequeñas. */
+  .detail-sidebar .card,
+  .detail-sidebar .danger-zone {
+    flex: none;
+    justify-content: flex-start;
   }
 }
 

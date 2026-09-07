@@ -38,6 +38,14 @@ export interface Incident {
   assignedTo?: string | null
   /** Nombre del operario asignado, resuelto por el backend para no tener que cruzarlo aquí. */
   assignedToName?: string | null
+  /**
+   * Dirección legible de la incidencia (opcional). Se calcula una única vez
+   * en el dispositivo al crear la incidencia (reverse geocoding) y el
+   * backend la guarda tal cual — mismo campo que ya usa Android
+   * (`Incident.address`). Null/undefined en incidencias antiguas, o
+   * creadas por un cliente que no la mande.
+   */
+  address?: string | null
 }
 
 export interface ResolveIncidentRequest {
