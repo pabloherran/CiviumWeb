@@ -4,6 +4,7 @@ import { listUsers } from '../api/admin'
 import {
   assignIncident,
   deleteIncident,
+  downloadIncidentPdf,
   getIncidentById,
   setIncidentResolved,
   unassignIncident,
@@ -44,6 +45,8 @@ export function IncidentDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [exportingPdf, setExportingPdf] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     if (!id) return
@@ -84,6 +87,29 @@ export function IncidentDetailPage() {
     } catch (err) {
       setDeleteError(getErrorMessage(err, 'No se ha podido eliminar la incidencia.'))
       setDeleting(false)
+    }
+  }
+
+  // Mismo endpoint que usa Android para "Exportar expediente (PDF)": pide
+  // el binario ya generado por el backend y lo descarga en el navegador.
+  async function handleExportPdf() {
+    if (!incident) return
+    setExportingPdf(true)
+    setExportError(null)
+    try {
+      const blob = await downloadIncidentPdf(incident.id)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `expediente-${incident.id.slice(0, 8)}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setExportError(getErrorMessage(err, 'No se ha podido generar el PDF.'))
+    } finally {
+      setExportingPdf(false)
     }
   }
 
@@ -174,6 +200,17 @@ export function IncidentDetailPage() {
           )}
 
           <AssignmentPanel incident={incident} onChanged={setIncident} />
+
+          {incident.status === 'RESOLVED' && (
+            <section className="card">
+              <h2>Expediente</h2>
+              <p className="hint">Genera el mismo PDF que la app Android para archivar o imprimir.</p>
+              {exportError && <div className="form-error">{exportError}</div>}
+              <button className="btn btn-secondary" onClick={handleExportPdf} disabled={exportingPdf}>
+                {exportingPdf ? 'Generando…' : 'Exportar expediente (PDF)'}
+              </button>
+            </section>
+          )}
 
           {canDelete && (
             <section className="danger-zone">

@@ -46,3 +46,16 @@ export async function unassignIncident(id: string): Promise<Incident> {
   const { data } = await apiClient.delete<Incident>(`incidencias/${id}/assign`)
   return data
 }
+
+/**
+ * Descarga el PDF del expediente (mismo endpoint que ya usa la app
+ * Android — el backend genera el documento, aquí solo se pide el
+ * binario). El backend responde 400 si la incidencia no está resuelta,
+ * así que el botón que llama a esto ya se oculta en ese caso.
+ */
+export async function downloadIncidentPdf(id: string): Promise<Blob> {
+  const { data } = await apiClient.get<Blob>(`incidencias/${id}/pdf`, {
+    responseType: 'blob',
+  })
+  return data
+}
