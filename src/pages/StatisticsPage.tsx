@@ -104,25 +104,33 @@ export function StatisticsPage() {
 
   useEffect(() => {
     let cancelled = false
-    setLoading(true)
-    setError(null)
-    getStatistics({
-      categories: categories.size > 0 ? Array.from(categories) : undefined,
-      statuses: statuses.size > 0 ? Array.from(statuses) : undefined,
-      municipalityIds: isSuperAdmin && municipios.size > 0 ? Array.from(municipios) : undefined,
-      granularity,
-    })
-      .then((data) => {
-        if (!cancelled) setStats(data)
+    // Debounce: varios filtros marcados seguidos (p. ej. 4-5 categorías en el
+    // multiselect) no deben disparar una petición por cada clic — cada una
+    // hace un listAll() completo en el backend cuando no hay municipio
+    // filtrado. Se espera 300ms de silencio antes de llamar a la API; si el
+    // usuario sigue cambiando filtros, el timer anterior se cancela.
+    const timer = setTimeout(() => {
+      setLoading(true)
+      setError(null)
+      getStatistics({
+        categories: categories.size > 0 ? Array.from(categories) : undefined,
+        statuses: statuses.size > 0 ? Array.from(statuses) : undefined,
+        municipalityIds: isSuperAdmin && municipios.size > 0 ? Array.from(municipios) : undefined,
+        granularity,
       })
-      .catch((err) => {
-        if (!cancelled) setError(getErrorMessage(err, 'No se han podido cargar las estadísticas.'))
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+        .then((data) => {
+          if (!cancelled) setStats(data)
+        })
+        .catch((err) => {
+          if (!cancelled) setError(getErrorMessage(err, 'No se han podido cargar las estadísticas.'))
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false)
+        })
+    }, 300)
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, statuses, municipios, granularity, isSuperAdmin])
