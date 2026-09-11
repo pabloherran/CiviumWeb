@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { getStatistics } from '../api/statistics'
+import { exportStatisticsPdf, getStatistics } from '../api/statistics'
 import { getClientMunicipalities } from '../api/admin'
 import { searchMunicipalities } from '../api/municipalities'
 import { useAuth } from '../context/AuthContext'
@@ -15,6 +15,7 @@ import type {
   StatusCount,
 } from '../types/statistics'
 import { CATEGORY_LABELS, STATUS_LABELS } from '../utils/labels'
+
 
 const CATEGORY_OPTIONS = Object.entries(CATEGORY_LABELS) as Array<[IncidentCategory, string]>
 const STATUS_OPTIONS = Object.entries(STATUS_LABELS) as Array<[IncidentStatus, string]>
@@ -101,6 +102,8 @@ export function StatisticsPage() {
   const [stats, setStats] = useState<Statistics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [exportingPdf, setExportingPdf] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -134,6 +137,35 @@ export function StatisticsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, statuses, municipios, granularity, isSuperAdmin])
+
+  // Mismo patrón que handleExportPdf en IncidentDetailPage.tsx: pide el
+  // blob ya generado por el backend y lo descarga en el navegador. Usa los
+  // mismos filtros que el fetch de arriba (categorías/estados/municipios
+  // activos) — el backend recalcula el rango de fechas según `granularity`.
+  async function handleExportPdf() {
+    setExportingPdf(true)
+    setExportError(null)
+    try {
+      const blob = await exportStatisticsPdf({
+        categories: categories.size > 0 ? Array.from(categories) : undefined,
+        statuses: statuses.size > 0 ? Array.from(statuses) : undefined,
+        municipalityIds: isSuperAdmin && municipios.size > 0 ? Array.from(municipios) : undefined,
+        granularity,
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `estadisticas-${granularity.toLowerCase()}-${new Date().toISOString().slice(0, 10)}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      setExportError(getErrorMessage(err, 'No se ha podido generar el PDF.'))
+    } finally {
+      setExportingPdf(false)
+    }
+  }
 
   // Municipios "cliente" (con al menos un admin activo), solo para el filtro
   // de SUPER_ADMIN — mismo endpoint que ya usa ClientMunicipalitiesPage.
@@ -274,7 +306,7 @@ export function StatisticsPage() {
           onChange={(next) => updateFilters({ estados: next.size > 0 ? Array.from(next).join(',') : null })}
         />
 
-        <div className="period-tabs">
+                <div className="period-tabs">
           {GRANULARITY_OPTIONS.map((opt) => (
             <button
               key={opt.value}
@@ -285,6 +317,10 @@ export function StatisticsPage() {
             </button>
           ))}
         </div>
+
+        <button className="btn btn-secondary" onClick={handleExportPdf} disabled={exportingPdf}>
+          {exportingPdf ? 'Generando…' : 'Exportar PDF'}
+        </button>
       </div>
 
       {activeFilterPills.length > 0 && (
@@ -308,6 +344,8 @@ export function StatisticsPage() {
           </button>
         </div>
       )}
+
+      {exportError && <div className="form-error">{exportError}</div>}
 
       {loading && <p className="hint">Cargando estadísticas…</p>}
       {error && <div className="form-error">{error}</div>}

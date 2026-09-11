@@ -16,3 +16,21 @@ export async function getStatistics(filters: StatisticsFilters): Promise<Statist
   const { data } = await apiClient.get<Statistics>('estadisticas', { params })
   return data
 }
+
+// Exporta a PDF las estadísticas del periodo actual (según granularity) con
+// los mismos filtros activos en pantalla. El backend recalcula el rango de
+// fechas (desde el inicio del periodo hasta ahora) — aquí solo se reenvían
+// los filtros, igual que en getStatistics.
+export async function exportStatisticsPdf(filters: StatisticsFilters): Promise<Blob> {
+  const params = new URLSearchParams()
+  filters.categories?.forEach((c) => params.append('category', c))
+  filters.statuses?.forEach((s) => params.append('status', s))
+  filters.municipalityIds?.forEach((m) => params.append('municipalityId', m))
+  if (filters.granularity) params.set('granularity', filters.granularity)
+
+  const { data } = await apiClient.get<Blob>('estadisticas/pdf', {
+    params,
+    responseType: 'blob',
+  })
+  return data
+}
