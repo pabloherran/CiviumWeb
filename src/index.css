@@ -1,5 +1,5 @@
 :root {
-  /* Paleta calcada de app/src/main/java/com/civium/theme/Color.kt (LightColors).
+  /* Paleta calcada de app/src/main/java/com/urvium/theme/Color.kt (LightColors).
      Diseño plano: gris claro en casi todo, azul de marca reservado como acento
      (título, estado activo, foco, botón principal). Sin sombras/elevación. */
   --color-bg: #f4f4f4; /* BrandBgLight / BrandWhite: fondo de página y de casi todos los componentes */

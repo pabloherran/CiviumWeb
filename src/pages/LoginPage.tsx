@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import civiumWordmark from '../assets/civium-wordmark.png'
+import urviumWordmark from '../assets/urvium-wordmark.png'
 import { getErrorMessage } from '../api/errors'
 
 export function LoginPage() {
@@ -35,7 +35,7 @@ export function LoginPage() {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={handleSubmit}>
-        <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
+        <img src={urviumWordmark} alt="URVIUM" className="login-wordmark" />
         <p className="login-subtitle">Portal de gestión municipal</p>
 
         <label className="field">
@@ -68,6 +68,10 @@ export function LoginPage() {
 
         <Link to="/recuperar-contrasena" className="btn-link" style={{ alignSelf: 'center' }}>
           ¿Olvidaste tu contraseña?
+        </Link>
+
+        <Link to="/aceptar-invitacion" className="btn-link" style={{ alignSelf: 'center' }}>
+          ¿Tienes un código de invitación? Regístrate
         </Link>
 
         <p className="login-hint">

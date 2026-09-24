@@ -11,6 +11,7 @@ import { IncidentsMapPage } from './pages/IncidentsMapPage'
 import { StatisticsPage } from './pages/StatisticsPage'
 import { UsersPage } from './pages/UsersPage'
 import { ClientMunicipalitiesPage } from './pages/ClientMunicipalitiesPage'
+import { PurgeBatchesPage } from './pages/PurgeBatchesPage'
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/estadisticas" element={<StatisticsPage />} />
           <Route path="/usuarios" element={<UsersPage />} />
           <Route path="/municipios-cliente" element={<ClientMunicipalitiesPage />} />
+          <Route path="/purga-anual" element={<PurgeBatchesPage />} />
           <Route path="/" element={<Navigate to="/incidencias" replace />} />
         </Route>
 

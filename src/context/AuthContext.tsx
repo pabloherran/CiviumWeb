@@ -11,7 +11,7 @@ import { TOKEN_STORAGE_KEY } from '../api/client'
 import type { AuthRegisterRequest } from '../types/auth'
 import type { User } from '../types/user'
 
-const USER_STORAGE_KEY = 'civium_portal_user'
+const USER_STORAGE_KEY = 'urvium_portal_user'
 
 const ROLE_MISMATCH_MESSAGE =
   'Este portal es solo para administradores municipales. Tu cuenta no tiene ese rol.'

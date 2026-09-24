@@ -1,16 +1,16 @@
-type CiviumLogoProps = {
+type UrviumLogoProps = {
   className?: string
 }
 
 /**
- * Marca de CIVIUM — mismo trazado que el icono de la app Android y el logo
- * del splash screen (`ic_civium_splash_logo_azul.xml`). El color se hereda
+ * Marca de URVIUM — mismo trazado que el icono de la app Android y el logo
+ * del splash screen (`ic_urvium_splash_logo_azul.xml`). El color se hereda
  * de `color` vía `currentColor`, así que el tamaño y el color se controlan
  * desde CSS con `className`.
  */
-export function CiviumLogo({ className }: CiviumLogoProps) {
+export function UrviumLogo({ className }: UrviumLogoProps) {
   return (
-    <svg viewBox="0 0 320.62 323.97" className={className} role="img" aria-label="CIVIUM">
+    <svg viewBox="0 0 320.62 323.97" className={className} role="img" aria-label="URVIUM">
       <path
         d="M255.56,261.14l-95.68,-55.24 -43.6,-25.18c-6.17,-3.56 -9.98,-10.15 -9.98,-17.28V12.96c0,-9.96 -10.78,-16.18 -19.41,-11.2L16.32,42.5C6.22,48.33 0,59.1 0,70.77v147.06c0,11.59 6.14,22.31 16.14,28.17l79.08,46.32 48.61,27.44c9.96,5.62 22.13,5.62 32.09,0l48.6,-27.44 30.96,-17.49c5.31,-3 5.35,-10.64 0.06,-13.69Z"
         fill="currentColor"

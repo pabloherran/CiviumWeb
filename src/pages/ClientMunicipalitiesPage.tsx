@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 
 /**
  * Solo SUPER_ADMIN: municipios que tienen al menos un MUNICIPAL_ADMIN
- * activo ahora mismo ("son cliente" de Civium). Sin tabla ni flag propios
+ * activo ahora mismo ("son cliente" de Urvium). Sin tabla ni flag propios
  * en el backend — se calcula al vuelo contra la tabla de usuarios, así que
  * este listado siempre refleja el estado real, alta o baja incluida.
  *

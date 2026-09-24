@@ -28,7 +28,7 @@ export function IncidentsMapPage() {
   const highlightedId = searchParams.get('incidentId')
 
   const { isLoaded, loadError } = useJsApiLoader({
-    id: 'civium-google-map',
+    id: 'urvium-google-map',
     googleMapsApiKey: GOOGLE_MAPS_API_KEY,
   })
 

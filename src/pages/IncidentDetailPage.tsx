@@ -66,12 +66,11 @@ export function IncidentDetailPage() {
   if (error && !incident) return <div className="form-error">{error}</div>
   if (!incident) return null
 
-  // El backend es quien impone la regla real (SUPER_ADMIN cualquier
-  // estado, MUNICIPAL_ADMIN solo resueltas y de su propio municipio); esto
-  // es solo para no mostrar un botón que el servidor rechazaría.
+  // MUNICIPAL_ADMIN ya no puede eliminar incidencias individualmente: el
+  // borrado de resueltas pasa solo por la purga anual (menú "Purga anual",
+  // visible únicamente para SUPER_ADMIN).
   const canDelete =
-    user?.role === 'SUPER_ADMIN' ||
-    (user?.role === 'MUNICIPAL_ADMIN' && incident.status === 'RESOLVED')
+    user?.role === 'SUPER_ADMIN' 
 
   async function handleDelete() {
     if (!incident) return

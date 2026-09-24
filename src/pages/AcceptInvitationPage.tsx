@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import civiumWordmark from '../assets/civium-wordmark.png'
+import urviumWordmark from '../assets/urvium-wordmark.png'
 import { getErrorMessage } from '../api/errors'
 
 /**
@@ -44,7 +44,7 @@ export function AcceptInvitationPage() {
     return (
       <div className="login-screen">
         <div className="login-card">
-          <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
+          <img src={urviumWordmark} alt="URVIUM" className="login-wordmark" />
           <p className="login-subtitle">Ya tienes una sesión iniciada</p>
           <p className="login-hint">
             Has entrado en el portal con la cuenta <strong>{user.email}</strong>. Para aceptar
@@ -112,7 +112,7 @@ export function AcceptInvitationPage() {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={handleSubmit}>
-        <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
+        <img src={urviumWordmark} alt="URVIUM" className="login-wordmark" />
         <p className="login-subtitle">Crear cuenta desde una invitación</p>
 
         <label className="field">

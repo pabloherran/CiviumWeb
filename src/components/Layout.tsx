@@ -1,7 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { ROLE_LABELS } from '../utils/labels'
-import civiumWordmark from '../assets/civium-wordmark.png'
+import urviumWordmark from '../assets/urvium-wordmark.png'
 
 const baseNavItems = [
   { to: '/incidencias', label: 'Incidencias' },
@@ -12,16 +12,21 @@ const baseNavItems = [
 
 export function Layout() {
   const { user, logout } = useAuth()
-  const navItems =
+    const navItems =
     user?.role === 'SUPER_ADMIN'
-      ? [...baseNavItems, { to: '/municipios-cliente', label: 'Municipios cliente' }]
+      ? [
+          ...baseNavItems,
+          { to: '/municipios-cliente', label: 'Municipios cliente' },
+          { to: '/purga-anual', label: 'Purga anual' },
+        ]
       : baseNavItems
+    
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <img src={civiumWordmark} alt="CIVIUM" className="sidebar-brand-wordmark" />
+          <img src={urviumWordmark} alt="URVIUM" className="sidebar-brand-wordmark" />
         </div>
         <nav className="sidebar-nav">
           {navItems.map((item) => (

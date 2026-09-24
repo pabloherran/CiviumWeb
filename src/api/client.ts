@@ -1,8 +1,8 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://api.civium.app/'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'https://api.urvium.es/'
 
-export const TOKEN_STORAGE_KEY = 'civium_portal_token'
+export const TOKEN_STORAGE_KEY = 'urvium_portal_token'
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

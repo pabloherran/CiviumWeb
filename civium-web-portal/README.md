@@ -1,11 +1,11 @@
-# CIVIUM · Portal web de gestión municipal
+# URVIUM · Portal web de gestión municipal
 
 Portal web pensado para que los **administradores municipales** (rol
 `MUNICIPAL_ADMIN`) y **superadministradores** (`SUPER_ADMIN`) gestionen las
 incidencias urbanas desde una oficina, sin depender de la app Android: ver el
 listado completo, filtrarlo, consultar el mapa de incidencias abiertas y
 administrar operarios/invitaciones. Consume el mismo backend Ktor que ya usa
-la app móvil (`IncidenciasBakcend`, desplegado en `https://api.civium.app/`).
+la app móvil (`IncidenciasBakcend`, desplegado en `https://api.urvium.app/`).
 
 ## Stack
 
@@ -36,7 +36,7 @@ npm run dev
 
 | Variable | Descripción |
 | --- | --- |
-| `VITE_API_BASE_URL` | URL base del backend. Debe terminar en `/`. Por defecto `https://api.civium.app/`. |
+| `VITE_API_BASE_URL` | URL base del backend. Debe terminar en `/`. Por defecto `https://api.urvium.app/`. |
 | `VITE_GOOGLE_MAPS_API_KEY` | API key de Google Maps JavaScript API, restringida por dominio en Google Cloud Console. Puede vivir en el mismo proyecto de GCP que ya usa la app Android (`MAPS_API_KEY`) o ser una key nueva restringida a este dominio. |
 
 Sin `VITE_GOOGLE_MAPS_API_KEY` la app funciona igualmente (login, listado,
@@ -111,7 +111,7 @@ desplegarse en cualquier hosting de estáticos con HTTPS. Ahora mismo se usa
 Railway como solución rápida; la recomendación a largo plazo, cuando el
 proyecto pase a producción real, es migrar a **Firebase Hosting**.
 
-Subdominio sugerido: `admin.civium.app` (`civium.app` y `api.civium.app` ya
+Subdominio sugerido: `admin.urvium.app` (`urvium.app` y `api.urvium.app` ya
 están ocupados). Se puede cambiar sin coste, es solo un registro DNS.
 
 ### Corto plazo: Railway
@@ -128,8 +128,8 @@ sin configuración adicional:
    variables*, no solo en runtime.
 3. Railway detecta Node automáticamente (Nixpacks) y usa `npm run build` +
    `npm run start` gracias a `railway.json`.
-4. En "Settings → Networking → Custom Domain", añade `admin.civium.app` y
-   crea el registro CNAME que te indique en el proveedor DNS de `civium.app`.
+4. En "Settings → Networking → Custom Domain", añade `admin.urvium.app` y
+   crea el registro CNAME que te indique en el proveedor DNS de `urvium.app`.
 5. Añade ese dominio a las restricciones HTTP referrer de la API key de
    Google Maps (ver más arriba).
 
@@ -152,7 +152,7 @@ alternativas:
   pero el Load Balancer tiene un coste fijo mensual (~18 $) incluso con
   tráfico mínimo — desproporcionado para un panel de administración interno.
 - Vercel/Netlify: excelente experiencia de desarrollo, pero es un proveedor
-  y una facturación aparte del resto de la infraestructura de Civium (GCP).
+  y una facturación aparte del resto de la infraestructura de Urvium (GCP).
 
 El repo ya trae preparado lo necesario para cuando llegue el momento de
 migrar:
@@ -180,7 +180,7 @@ firebase deploy
 ```
 
 Después, en la consola de Firebase Hosting: "Add custom domain" →
-`admin.civium.app` → sigue las instrucciones de verificación y el registro
+`admin.urvium.app` → sigue las instrucciones de verificación y el registro
 DNS que te indique. Firebase emite y renueva el certificado SSL solo.
 
 ### En cualquier caso

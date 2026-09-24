@@ -1,7 +1,7 @@
 import { type FormEvent, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import civiumWordmark from '../assets/civium-wordmark.png'
+import urviumWordmark from '../assets/urvium-wordmark.png'
 import { forgotPassword, resetPassword } from '../api/auth'
 import { getErrorMessage } from '../api/errors'
 
@@ -86,7 +86,7 @@ export function ForgotPasswordPage() {
   return (
     <div className="login-screen">
       <div className="login-card">
-        <img src={civiumWordmark} alt="CIVIUM" className="login-wordmark" />
+        <img src={urviumWordmark} alt="URVIUM" className="login-wordmark" />
 
         {step === 'done' ? (
           <>
